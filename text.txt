@@ -1,0 +1,32 @@
+The Go Programming Language
+Documents Packages The Project Help Blog
+Next article
+
+JSON and Go
+Previous article
+
+Go: one year ago today
+Links
+
+    golang.org
+    Install Go
+    A Tour of Go
+    Go Documentation
+    Go Mailing List
+    Go on Google+
+    Go+ Community
+    Go on Twitter
+
+Blog index
+The Go Blog
+Go Slices: usage and internals
+
+5 January 2011
+Introduction
+
+Go's slice type provides a convenient and efficient means of working with sequences of typed data. Slices are analogous to arrays in other languages, but have some unusual properties. This article will look at what slices are and how they are used.
+Arrays
+
+The slice type is an abstraction built on top of Go's array type, and so to understand slices we must first understand arrays.
+
+An array type definition specifies a length and an element type. For example, the type [4]int represents an array of four integers. An array's size is fixed; its length is part of its type ([4]int and [5]int are distinct, incompatible types). Arrays can be indexed in the usual way, so the expression s[n] accesses the nth element, starting from zero.
