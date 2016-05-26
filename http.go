@@ -1,9 +1,12 @@
+// should read: https://rcrowley.org/talks/strange-loop-2013.html#1
+
 package main
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type Message struct {
@@ -32,9 +35,16 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write(j)
 }
 
+func serve(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, ">>> A long task finished.")
+	time.Sleep(5 * time.Second)
+	// test: for i in $(seq 1 3); do (time curl -sS localhost:8080/serve &); done
+}
+
 func main() {
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/about", about)
 	http.HandleFunc("/hello", hello)
+	http.HandleFunc("/serve", serve)
 	http.ListenAndServe(":8080", nil)
 }
