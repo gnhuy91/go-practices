@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	c1 := make(chan string)
-	c2 := make(chan string)
+	c1 := make(chan interface{})
+	c2 := make(chan interface{})
 
 	go func() {
 		time.Sleep(time.Second * 2)
@@ -18,10 +18,10 @@ func main() {
 
 	go func() {
 		time.Sleep(time.Second * 2)
-		c2 <- "two"
+		c2 <- 2
 	}()
 
-	for range []chan string{c1, c2} {
+	for range []chan interface{}{c1, c2} {
 		select {
 		case msg1 := <-c1:
 			fmt.Println("received", msg1)
