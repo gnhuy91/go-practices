@@ -18,12 +18,21 @@ type Message struct {
 	Text string `json:"msg"`
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	s := fmt.Sprintf("Welcome!")
-	// if composed the string in a struct, json.Marshal can return json (key&value)
-	// based on struct field name (if no `json:field` specified) and string content.
-	j, _ := json.Marshal(&Message{s})
-	w.Write(j)
+// my version copied from tsenart's, looks like more of a mess but it works!
+func welcomeHandler(config string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		name := vars["name"]
+		fmt.Fprintf(w, "Welcome!, config: %s, user: %s", config, name)
+	}
+}
+
+func middleware(l *log.Logger, next func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		began := time.Now()
+		next(w, r)
+		l.Printf("%s: %s %s took %s", time.Now(), r.Method, r.URL, time.Since(began))
+	}
 }
 
 func about(w http.ResponseWriter, r *http.Request) {
@@ -68,11 +77,18 @@ func main() {
 	logger := log.New(os.Stdout, "", 0)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", handler)
+
+	// my version of 'HTTP closure'
+	config := "my config"
+	r.HandleFunc("/welcome/{name}", welcomeHandler(config))
+	r.HandleFunc("/_welcome/{name}", middleware(logger, welcomeHandler(config)))
+
+	// hanlders without closure
 	r.HandleFunc("/about", about)
 	r.HandleFunc("/hello", hello)
 	r.HandleFunc("/serve", serve)
 
+	// tsenart's version (y)
 	r.Handle("/user/{name}", userHandler())
 	r.Handle("/_user/{name}", withMetrics(logger, userHandler()))
 
